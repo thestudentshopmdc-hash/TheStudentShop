@@ -1,1 +1,1 @@
-# TheStudentShop
+# thestudentshopmdc-gmail.com
