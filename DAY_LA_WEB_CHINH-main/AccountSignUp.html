@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width= device-width, initial-scale= 1.0">
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     <link rel="stylesheet" href="AccountSignUp.css">
+</head>
+
+<body>
+    <a href= "index.html">
+         <img id="TrangChuIcon" src="home.png" height="45" width="45" alt="Trang chủ"></img>
+    </a>
+   <div class="khung">
+    <div class="SignupP">
+    <div class="information">
+         <h1> Đăng ký tại đây</h1>
+    <div>
+         <label>Username:</label>
+         <input required type="name" name = "Tên" id ="username" maxlength="30" placeholder="Nhập tên của bạn">
+    </div> <br>
+    <div>
+        <label>Email:</label>
+        <input required type="email" name="Email" id = "email" placeholder="Nhập email của bạn">
+    </div> <br>
+    <div>
+        <label>Password:</label>
+        <input required type="password" name="password" id ="password" placeholder="Mật khẩu khởi tạo">
+    </div> <br>
+    <div>
+        <label>Re-password:</label>
+        <input required type="password" name="re-password" id ="repassword" placeholder="Nhập lại mật khẩu">
+    </div> <br>
+    <p id="SignupMessage" style="color: red;" ></p>
+    <div id = "submitIn4"> <button type="button">Đăng ký</button></div>
+    </div> 
+  
+    <br><br>
+        
+    <div class="LoginPage">
+        <h1> Đăng nhập tại đây</h1>
+        <label>Email:</label>
+        <input required type="email" placeholder="Nhập email" id="LoginEmail">
+        <br><br>
+        <label>Password:</label>
+        <input required type="password" placeholder="Nhập mật khẩu" id="LoginPassword">
+        <br>
+        <p id="LoginMessage" style="color: red;" ></p>
+        <button type="button" id ="Loginbutt">Đăng nhập</button>
+    </div> <br>
+    </div>
+    <p id="message"></p>
+    <br>
+    <br>
+</div>
+    <script type = "module" src="AccountSignUp.js"></script>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+</html>

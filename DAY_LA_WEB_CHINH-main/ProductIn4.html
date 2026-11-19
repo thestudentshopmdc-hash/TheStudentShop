@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="ProductIn4.css">
+</head>
+
+<body>
+
+<a href="index.html">
+    <img id="TrangChuIcon" src="home.png" height="45" width="45" alt="Trang chủ">
+</a>
+
+<div class="SignupZ">
+    <h1 id="MessageForUser">Đăng ký sản phẩm</h1>
+
+    <div class="Information">
+
+        <div class="userInformation">
+            <div>
+                <h2>Thông tin người bán</h2>
+                <label>Họ và Tên: </label>
+                <input required type="text" name="Tên" id="username" maxlength="50" placeholder="Nhập họ và tên của bạn">
+            </div>
+            <br>
+
+            <div>
+                <label>Trường: </label>
+                <input required type="text" name="Trường" id="schoolName" placeholder="Nhập tên trường bạn đang học">
+            </div>
+            <br>
+
+            <div>
+                <label>Số điện thoại(Zalo): </label>
+                <input required type="tel" name="Số điện thoại" id="phoneNumber" placeholder="Nhập số điện thoại">
+            </div>
+            <br>
+
+            <div>
+                <label>Link tài khoản Facebook: </label>
+                <input required type="url" name="facebook" id="facebookAccount" placeholder="Điền link tài khoản facebook">
+            </div>
+            <br>
+
+            <div class="ProductImage">
+                <label>Thẻ học sinh(bắt buộc): </label>
+                <input required type="file" name="imageCard" id="ImageCard" accept="image/*">
+            </div>
+        </div>
+
+        <div class="ProductIn4">
+            <div>
+                <h2>Thông tin sản phẩm đăng ký</h2>
+                <label>Tên sản phẩm: </label>
+                <input required type="text" name="TênSp" id="ProductName" maxlength="100" placeholder="Điền tên sản phẩm">
+            </div>
+            <br>
+
+            <div>
+                <label>Mô tả sản phẩm: </label>
+                <input required type="text" name="Describe" id="ProductDetail" placeholder="Nhập chi tiết thông tin sản phẩm">
+            </div>
+            <br>
+
+            <div>
+                <label>Giá bán: </label>
+                <input required type="number" name="PriceTag" id="PriceTag" min="0" placeholder="Giá bán sản phẩm">
+            </div>
+            <br>
+
+            <div class="ProductImage">
+                <label>Hình ảnh sản phẩm: </label>
+                <input required type="file" name="imageProduct" id="ProductImage" accept="image/*">
+            </div>
+        </div>
+
+    </div>
+
+    <div>
+        <button type="button" id="submitIn4">Đăng ký sản phẩm</button>
+    </div>
+</div>
+
+<script type="module">
+
+    const supabaseUrl = "https://rsndakviombsnwebuegy.supabase.co";
+    const supabaseAnonKey = "sb_publishable_jLDAR7Kpb6W65lgmvpVSMA_9shoqFxk";
+
+    const supabaseClient = window.supabase.createClient(
+        supabaseUrl,
+        supabaseAnonKey
+    );
+
+    const submitButton = document.getElementById("submitIn4");
+    const MessageAfterProduct = document.getElementById("MessageForUser");
+
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        alert("Vui lòng đăng nhập để thực hiện đăng ký sản phẩm");
+        window.location.replace("index.html");
+    } else {
+
+        submitButton.addEventListener("click", async (e) => {
+
+            e.preventDefault();
+
+            if (submitButton.disabled) {
+                return;
+            }
+
+            const userName = document.getElementById("username").value.trim();
+            const schoolName = document.getElementById("schoolName").value.trim();
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+            const linkFacebook = document.getElementById("facebookAccount").value.trim();
+
+            const ProductName = document.getElementById("ProductName").value.trim();
+            const ProductDetail = document.getElementById("ProductDetail").value.trim();
+            const ProductPrice = document.getElementById("PriceTag").value;
+
+            const cardImg = document.getElementById("ImageCard").files[0];
+            const ProductImg = document.getElementById("ProductImage").files[0];
+
+            if (
+                userName === "" ||
+                schoolName === "" ||
+                phoneNumber === "" ||
+                linkFacebook === "" ||
+                ProductName === "" ||
+                ProductDetail === "" ||
+                ProductPrice === ""
+            ) {
+                alert("Vui lòng nhập đầy đủ thông tin");
+                return;
+            }
+
+            if (!Number.isFinite(Number(ProductPrice)) || Number(ProductPrice) < 0) {
+                alert("Vui lòng nhập giá bán hợp lệ");
+                return;
+            }
+
+            if (!cardImg || !ProductImg) {
+                alert("Vui lòng chọn đầy đủ hình ảnh");
+                return;
+            }
+
+            const maxCardSize = 2 * 1024 * 1024;
+            const maxProductSize = 3 * 1024 * 1024;
+
+            if (cardImg.size > maxCardSize) {
+                alert("Ảnh thẻ học sinh không được vượt quá 2MB");
+                return;
+            }
+
+            if (ProductImg.size > maxProductSize) {
+                alert("Ảnh sản phẩm không được vượt quá 3MB");
+                return;
+            }
+
+            if (!cardImg.type.startsWith("image/") || !ProductImg.type.startsWith("image/")) {
+                alert("Vui lòng chọn file hình ảnh hợp lệ");
+                return;
+            }
+
+            submitButton.disabled = true;
+
+            let uploadedFiles = [];
+
+            try {
+
+                const UserID = user.id;
+                const RegistID = crypto.randomUUID();
+
+                const extCard = cardImg.name.split(".").pop().toLowerCase();
+                const extProduct = ProductImg.name.split(".").pop().toLowerCase();
+
+                const filePathCard =
+                    `${UserID}/student_Card/${RegistID}_Card.${extCard}`;
+
+                const filePathProduct =
+                    `${UserID}/product_Image/${RegistID}_Product.${extProduct}`;
+
+                const { data: dataImgSTC, error: errorSTC } =
+                    await supabaseClient.storage
+                        .from("UserFiles")
+                        .upload(filePathCard, cardImg, {
+                            cacheControl: "3600",
+                            upsert: false,
+                            contentType: cardImg.type
+                        });
+
+                if (errorSTC) {
+                    throw errorSTC;
+                }
+
+                uploadedFiles.push(filePathCard);
+
+                const { data: dataImgPro, error: errorImgPro } =
+                    await supabaseClient.storage
+                        .from("UserFiles")
+                        .upload(filePathProduct, ProductImg, {
+                            cacheControl: "3600",
+                            upsert: false,
+                            contentType: ProductImg.type
+                        });
+
+                if (errorImgPro) {
+                    throw errorImgPro;
+                }
+
+                uploadedFiles.push(filePathProduct);
+
+                const { error: insertError } = await supabaseClient
+                    .from("ProductSignUp")
+                    .insert([
+                        {
+                            registration_id: RegistID,
+                            user_id: UserID,
+
+                            user_name: userName,
+                            user_school: schoolName,
+                            user_ZaloTel: phoneNumber,
+                            user_FacebookLink: linkFacebook,
+
+                            product_Name: ProductName,
+                            product_Price: Number(ProductPrice),
+                            product_Detail: ProductDetail,
+
+                            user_CardPath: filePathCard,
+                            product_ImagePath: filePathProduct
+                        }
+                    ]);
+
+                if (insertError) {
+                    throw insertError;
+                }
+
+                MessageAfterProduct.textContent = "Đăng ký sản phẩm thành công";
+                window.location.href = "PhanDangKyThanhCong.html";
+
+            } catch (error) {
+
+                if (uploadedFiles.length > 0) {
+                    await supabaseClient.storage
+                        .from("UserFiles")
+                        .remove(uploadedFiles);
+                }
+
+                alert("Đăng ký thất bại do " + error.message);
+
+                submitButton.disabled = false;
+            }
+
+        });
+
+    }
+
+</script>
+
+</body>
+</html>
